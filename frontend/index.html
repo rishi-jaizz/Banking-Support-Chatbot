@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered Banking Support Chatbot - Get instant answers to your banking queries about loans, credit cards, accounts, and more.">
+    <title>BankAssist AI — Banking Support Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Animated background -->
+        <div class="bg-animation">
+            <div class="bg-orb bg-orb-1"></div>
+            <div class="bg-orb bg-orb-2"></div>
+            <div class="bg-orb bg-orb-3"></div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>BankAssist AI</h1>
+                        <span class="logo-subtitle">Smart Banking Support</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn" onclick="startNewChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Conversation
+            </button>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Quick Topics</h3>
+                <div class="quick-topics">
+                    <button class="topic-btn" onclick="sendQuickTopic('What types of savings accounts are available?')">
+                        <span class="topic-icon">🏦</span> Savings Accounts
+                    </button>
+                    <button class="topic-btn" onclick="sendQuickTopic('Tell me about home loan eligibility and interest rates')">
+                        <span class="topic-icon">🏠</span> Home Loans
+                    </button>
+                    <button class="topic-btn" onclick="sendQuickTopic('What are the different types of credit cards?')">
+                        <span class="topic-icon">💳</span> Credit Cards
+                    </button>
+                    <button class="topic-btn" onclick="sendQuickTopic('How does UPI payment work?')">
+                        <span class="topic-icon">📱</span> UPI Payments
+                    </button>
+                    <button class="topic-btn" onclick="sendQuickTopic('What documents are needed for KYC?')">
+                        <span class="topic-icon">📋</span> KYC Process
+                    </button>
+                    <button class="topic-btn" onclick="sendQuickTopic('Tell me about fixed deposit interest rates and benefits')">
+                        <span class="topic-icon">💰</span> Fixed Deposits
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="powered-by">
+                    <span class="pulse-dot"></span>
+                    Powered by RAG + Gemini AI
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="top-bar-info">
+                    <h2>Banking Assistant</h2>
+                    <span class="status-indicator" id="statusIndicator">
+                        <span class="status-dot online"></span>
+                        Online
+                    </span>
+                </div>
+                <button class="clear-btn" onclick="clearChat()" title="Clear conversation">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Chat Messages -->
+            <div class="chat-container" id="chatContainer">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="1.5">
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#6366f1"/>
+                                    <stop offset="100%" style="stop-color:#06b6d4"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="welcome-title">Welcome to BankAssist AI</h2>
+                    <p class="welcome-subtitle">Your intelligent banking support assistant. Ask me anything about accounts, loans, credit cards, payments, and more.</p>
+                    
+                    <div class="welcome-cards">
+                        <div class="welcome-card" onclick="sendQuickTopic('What is the eligibility for a personal loan?')">
+                            <div class="card-icon">💸</div>
+                            <div class="card-text">
+                                <strong>Personal Loan</strong>
+                                <span>Check eligibility & rates</span>
+                            </div>
+                        </div>
+                        <div class="welcome-card" onclick="sendQuickTopic('How to open a savings account? What documents are needed?')">
+                            <div class="card-icon">📂</div>
+                            <div class="card-text">
+                                <strong>Open Account</strong>
+                                <span>Documents & process</span>
+                            </div>
+                        </div>
+                        <div class="welcome-card" onclick="sendQuickTopic('What are the charges for credit card late payment?')">
+                            <div class="card-icon">💳</div>
+                            <div class="card-text">
+                                <strong>Credit Card Fees</strong>
+                                <span>Charges & penalties</span>
+                            </div>
+                        </div>
+                        <div class="welcome-card" onclick="sendQuickTopic('What is the difference between NEFT, RTGS, and IMPS?')">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-text">
+                                <strong>Fund Transfers</strong>
+                                <span>NEFT vs RTGS vs IMPS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages will be inserted here -->
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Ask about loans, accounts, cards, payments..." 
+                        rows="1"
+                        maxlength="2000"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <p class="input-disclaimer">BankAssist AI uses RAG to provide information from banking documents. Always verify with your bank.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

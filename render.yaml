@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: bankassist-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: APP_PORT
+        value: 10000
+    healthCheckPath: /api/health
