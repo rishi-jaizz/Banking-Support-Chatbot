@@ -8,18 +8,7 @@ An advanced, production-ready AI-powered Banking Support Chatbot built using **R
 ![Render](https://img.shields.io/badge/Render-Backend-blue?style=for-the-badge&logo=render)
 ![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
 
----
 
-## 📸 User Interface Preview
-
-### 📊 Enterprise Dashboard Preview
-![Enterprise Dashboard Preview](docs/dashboard_preview.png)
-
-### 📁 Live Knowledge Base & Document Upload
-![Document Upload](docs/document_upload.png)
-
-
----
 
 ## 🏗️ Architecture & Pipeline Flow
 
