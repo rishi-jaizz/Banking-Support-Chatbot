@@ -12,11 +12,12 @@ An advanced, production-ready AI-powered Banking Support Chatbot built using **R
 
 ## 📸 User Interface Preview
 
-### 💬 Chat Interface (with Real-time Source Citations)
-![Chat Interface](docs/chatbot_interface.png)
+### 📊 Enterprise Dashboard Preview
+![Enterprise Dashboard Preview](docs/dashboard_preview.png)
 
 ### 📁 Live Knowledge Base & Document Upload
 ![Document Upload](docs/document_upload.png)
+
 
 ---
 
@@ -301,7 +302,4 @@ venv/bin/python scratch/test_refinements.py
 venv/bin/python scratch/test_document_management.py
 ```
 
----
 
-## 📄 License
-Educational Assessment Sandbox. Developed by Google DeepMind Agentic Coding Pair.
