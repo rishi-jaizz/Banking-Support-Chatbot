@@ -4,6 +4,7 @@ Wraps sentence-transformers for generating text embeddings.
 """
 
 import logging
+import functools
 from sentence_transformers import SentenceTransformer
 from app.config import settings
 
@@ -39,6 +40,7 @@ class EmbeddingService:
         embeddings = self.model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
         return embeddings.tolist()
 
+    @functools.lru_cache(maxsize=256)
     def generate_query_embedding(self, query: str) -> list[float]:
         """
         Generate embedding for a single query.

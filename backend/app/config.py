@@ -18,6 +18,12 @@ class Settings(BaseSettings):
 
     # API Keys
     GOOGLE_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+
+    # LLM Settings
+    LLM_PROVIDER: str = "gemini"  # "gemini", "groq", "openai"
+
 
     # Application
     APP_ENV: str = "development"
@@ -29,6 +35,13 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 50
     TOP_K_RESULTS: int = 5
     COLLECTION_NAME: str = "banking_knowledge"
+    MIN_RELEVANCE_THRESHOLD: float = 0.28
+    LLM_TIMEOUT: float = 20.0
+    LLM_MAX_RETRIES: int = 3
+
+    # Rate Limiting
+    RATE_LIMIT_CHAT: int = 30
+    RATE_LIMIT_UPLOAD: int = 5
 
     # Models
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
@@ -37,6 +50,11 @@ class Settings(BaseSettings):
     # Paths
     DATA_DIR: str = str(Path(__file__).resolve().parent.parent / "data" / "banking_knowledge")
     CHROMA_PERSIST_DIR: str = str(Path(__file__).resolve().parent.parent / "chroma_db")
+    SESSIONS_DIR: str = str(Path(__file__).resolve().parent.parent / "data" / "sessions")
+    METADATA_PATH: str = str(Path(__file__).resolve().parent.parent / "data" / "documents_metadata.json")
+
+    # CORS Settings
+    CORS_ORIGINS: str = "*"
 
     class Config:
         env_file = ".env"

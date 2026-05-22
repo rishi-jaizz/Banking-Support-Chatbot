@@ -6,6 +6,7 @@ Handles loading, chunking, and indexing banking documents into ChromaDB.
 import os
 import logging
 import hashlib
+import shutil
 from pathlib import Path
 
 import chromadb
@@ -31,8 +32,44 @@ class DocumentIngestionPipeline:
         self.collection = None
         self.documents_count = 0
 
+    def copy_default_documents_if_needed(self):
+        """
+        In production with persistent disks, the target DATA_DIR might be empty.
+        This copies default files from the package data folder to the target directory.
+        """
+        default_data_dir = Path(__file__).resolve().parent.parent / "data" / "banking_knowledge"
+        target_data_dir = Path(settings.DATA_DIR)
+        
+        # Ensure target data directory exists
+        os.makedirs(target_data_dir, exist_ok=True)
+        
+        # Check if default data directory exists and is different from the target
+        if not default_data_dir.exists() or default_data_dir.resolve() == target_data_dir.resolve():
+            return
+            
+        # Check if target directory is empty (no md, txt, or pdf files)
+        target_files = (
+            list(target_data_dir.glob("*.md")) +
+            list(target_data_dir.glob("*.txt")) +
+            list(target_data_dir.glob("*.pdf"))
+        )
+        
+        if not target_files:
+            logger.info(f"Target data directory '{target_data_dir}' is empty. Copying default documents from '{default_data_dir}'...")
+            copied_count = 0
+            for file_path in default_data_dir.iterdir():
+                if file_path.is_file() and not file_path.name.startswith("."):
+                    try:
+                        shutil.copy2(file_path, target_data_dir)
+                        logger.info(f"Copied default file: {file_path.name}")
+                        copied_count += 1
+                    except Exception as e:
+                        logger.error(f"Failed to copy default file {file_path.name}: {e}")
+            logger.info(f"Successfully copied {copied_count} default documents.")
+
     def initialize(self):
         """Initialize ChromaDB client and collection."""
+        self.copy_default_documents_if_needed()
         logger.info(f"Initializing ChromaDB at: {settings.CHROMA_PERSIST_DIR}")
 
         # Create persist directory if it doesn't exist
@@ -83,8 +120,28 @@ class DocumentIngestionPipeline:
                 "source": file_path.name
             })
 
+        # Also load .pdf files
+        for file_path in sorted(data_dir.glob("*.pdf")):
+            logger.info(f"Loading document: {file_path.name}")
+            try:
+                from pypdf import PdfReader
+                reader = PdfReader(file_path)
+                content_parts = []
+                for page in reader.pages:
+                    text = page.extract_text()
+                    if text:
+                        content_parts.append(text)
+                content = "\n\n".join(content_parts)
+                documents.append({
+                    "content": content,
+                    "source": file_path.name
+                })
+            except Exception as e:
+                logger.error(f"Error loading PDF {file_path.name}: {e}")
+
         logger.info(f"Loaded {len(documents)} documents")
         return documents
+
 
     def chunk_text(self, text: str, chunk_size: int = None, chunk_overlap: int = None) -> list[str]:
         """

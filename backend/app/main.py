@@ -17,7 +17,7 @@ from app.config import settings
 from app.rag.ingestion import ingestion_pipeline
 from app.rag.embeddings import embedding_service
 from app.rag.generator import generator
-from app.routes import chat, health
+from app.routes import chat, health, upload
 
 # Configure logging
 logging.basicConfig(
@@ -31,10 +31,12 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """
     Application lifespan handler.
-    Initializes the RAG pipeline on startup.
+    Initializes the RAG pipeline on startup with detailed logging.
     """
     logger.info("=" * 60)
-    logger.info("Banking Support Chatbot - Starting Up")
+    logger.info("BankAssist AI — Starting Up")
+    logger.info(f"Provider: {settings.LLM_PROVIDER} | Model: {settings.LLM_MODEL}")
+    logger.info(f"Embeddings: {settings.EMBEDDING_MODEL} | Chunk: {settings.CHUNK_SIZE}/{settings.CHUNK_OVERLAP}")
     logger.info("=" * 60)
 
     # Step 1: Load embedding model
@@ -50,13 +52,13 @@ async def lifespan(app: FastAPI):
     ingestion_pipeline.ingest_documents()
 
     # Step 4: Initialize LLM
-    logger.info("[4/4] Initializing Gemini LLM...")
+    logger.info(f"[4/4] Initializing {settings.LLM_PROVIDER.upper()} LLM...")
     try:
         generator.initialize()
-        logger.info("Gemini LLM initialized successfully")
+        logger.info(f"LLM initialized: {settings.LLM_PROVIDER}/{generator.model_name}")
     except ValueError as e:
         logger.warning(f"LLM initialization warning: {e}")
-        logger.warning("Chat will not work without GOOGLE_API_KEY")
+        logger.warning("Chat will not work without a valid API key")
 
     logger.info("=" * 60)
     logger.info(f"RAG Pipeline Ready | {ingestion_pipeline.documents_count} chunks indexed")
@@ -64,22 +66,29 @@ async def lifespan(app: FastAPI):
 
     yield  # Application runs
 
-    logger.info("Banking Support Chatbot - Shutting Down")
+    logger.info("BankAssist AI — Shutting Down")
 
 
 # Create FastAPI app
 app = FastAPI(
-    title="Banking Support Chatbot API",
-    description="AI-powered banking support chatbot using RAG with ChromaDB and Google Gemini",
-    version="1.0.0",
+    title="BankAssist AI — Banking Support Chatbot API",
+    description="AI-powered banking support chatbot using Retrieval-Augmented Generation (RAG) with ChromaDB vector database and multi-provider LLM support (Gemini/Groq/OpenAI).",
+    version="2.0.0",
     lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 # CORS middleware
+origins = [org.strip() for org in settings.CORS_ORIGINS.split(",") if org.strip()]
+allow_credentials = True
+if "*" in origins:
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -87,6 +96,7 @@ app.add_middleware(
 # Include API routes
 app.include_router(chat.router)
 app.include_router(health.router)
+app.include_router(upload.router)
 
 # Serve frontend static files
 frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
@@ -100,7 +110,7 @@ async def serve_frontend():
     index_path = frontend_dir / "index.html"
     if index_path.exists():
         return FileResponse(str(index_path))
-    return {"message": "Banking Support Chatbot API", "docs": "/docs"}
+    return {"message": "BankAssist AI API", "docs": "/docs"}
 
 
 if __name__ == "__main__":

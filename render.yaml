@@ -10,4 +10,16 @@ services:
         value: production
       - key: APP_PORT
         value: 10000
+      - key: DATA_DIR
+        value: /data/banking_knowledge
+      - key: CHROMA_PERSIST_DIR
+        value: /data/chroma_db
+      - key: SESSIONS_DIR
+        value: /data/sessions
+      - key: METADATA_PATH
+        value: /data/documents_metadata.json
     healthCheckPath: /api/health
+    disk:
+      name: bankassist-data
+      mountPath: /data
+      sizeGB: 1

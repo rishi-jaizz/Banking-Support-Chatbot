@@ -31,3 +31,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Runtime files & database caches
+backend/data/sessions/
+backend/data/documents_metadata.json
+backend/data/banking_knowledge/test_knowledge.txt
